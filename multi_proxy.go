@@ -20,21 +20,25 @@ func (p multiProxy) Response(*http.Response) error {
 	return nil
 }
 
-// 由于service-worker.js会拦截浏览器请求导致请求无法附带session cookie，所以无法切换，写此中间件以检查referer方式实现切换
+// 由于service-worker.js会拦截浏览器请求，导致附带session cookie的请求无法发送，所以无法切换，写此中间件以检查referer方式实现切换
 func (p multiProxy) checkServiceWorker() func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
-		if ctx.Request.RequestURI == "/service-worker.js" {
-			referer := ctx.GetHeader("referer")
-			usefulUrl, _ := url.Parse(referer)
-			newTarget := strings.Split(usefulUrl.Path, "/")[1]
-			if !register.ExistDomain(newTarget) {
-				return
-			}
-			err := register.SetTargetDomain(ctx, newTarget)
-			if err != nil {
-				p.logger.Errorf("修改session出错:%s", err)
-			}
+
+		referer := ctx.GetHeader("referer")
+		if referer == "" {
+			return
 		}
+
+		usefulUrl, _ := url.Parse(referer)
+		newTarget := strings.Split(usefulUrl.Path, "/")[1]
+		if !register.ExistDomain(newTarget) {
+			return
+		}
+		err := register.SetTargetDomain(ctx, newTarget)
+		if err != nil {
+			p.logger.Errorf("修改session出错:%s", err)
+		}
+
 	}
 }
 
@@ -48,6 +52,9 @@ func init() {
 	var redirectFlag bool
 	if redirect == "true" {
 		redirectFlag = true
+	}
+	if len(supportSites) == 1 && supportSites[0] == "" {
+		p.logger.Errorf("参数不合法")
 	}
 	for _, v := range supportSites {
 		targetProperty = strings.Split(v, "://")
