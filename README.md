@@ -7,21 +7,21 @@
 
 本程序支持以下参数
 
-> target [`scheme`]://[`domain/ip:port`]://[`nickname`],[`scheme2`]://[`domain/ip:port`]://[`nickname2`],`...`	 ——反代站点参数
+> target `scheme`://[`domain/ip:port`]://[`nickname`],[`scheme2`]://[`domain/ip:port`]://[`nickname2`],`...`	 ——反代站点参数
 >
-> redirect [`bool`]	——是否重定向
+> redirect `bool`	——是否重定向
 
 ### 如何传入
 
 由于此程序仅为插件，所以传入参数的方式略微特殊。
 
-启动程序时使用 `-add target=xxx;redirect=[bool]`启动
+启动程序时使用 `-add "target=xxx;redirect=[bool]"`启动
 
 ### 例
 
 假设我需要使用此项目反代`http://127.0.0.1:2333`和`http://127.0.0.1:2334`，并分别设置通过`/123`和`/456`的方式来访问这两个服务（不这么做的话，默认需要访问`/127.0.0.1:2333`和`/127.0.0.1:2334`来访问服务），那么我们需要这么配置程序启动参数
 
->  ./MultiProxy -add target=http://127.0.0.1:2333://123,http://127.0.0.1:2334://456
+>  ./MultiProxy -add "target=http://127.0.0.1:2333://123,http://127.0.0.1:2334://456"
 
 
 
@@ -29,7 +29,7 @@
 
 使用方式为
 
->  ./MultiProxy -add target=http://127.0.0.1:2333://123,http://127.0.0.1:2334://456;**redirect=true**
+>  ./MultiProxy -add "target=http://127.0.0.1:2333://123,http://127.0.0.1:2334://456;**redirect=true**"
 
 
 
